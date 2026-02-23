@@ -117,7 +117,7 @@ async def play(update: Update, context: ContextTypes.DEFAULT_TYPE):
     await update.message.reply_audio(audio=open("song.mp3", "rb"))
 
 import os
-app = ApplicationBuilder().token(os.environ.get("8503308378:AAEw4MatDnEsp9C7KqJFvsthmuU15o6Vn1k")).build()
+app = ApplicationBuilder().token(os.environ.get("BOT_TOKEN")).build()
 
 app.add_handler(CommandHandler("start", start))
 app.add_handler(CommandHandler("addtask", addtask))
