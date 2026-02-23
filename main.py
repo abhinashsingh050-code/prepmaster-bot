@@ -131,11 +131,12 @@ app.add_handler(CommandHandler("makepdf", makepdf))
 app.add_handler(CommandHandler("play", play))
 app.add_handler(MessageHandler(filters.PHOTO, photo))
 
-import os
 PORT = int(os.environ.get("PORT", 10000))
+TOKEN = os.environ["BOT_TOKEN"]
+URL = os.environ["RENDER_EXTERNAL_URL"]
 
 app.run_webhook(
     listen="0.0.0.0",
     port=PORT,
-    webhook_url=os.environ["RENDER_EXTERNAL_URL"]
+    webhook_url=f"{URL}/{TOKEN}"
 )
