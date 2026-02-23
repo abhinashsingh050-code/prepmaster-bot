@@ -131,4 +131,11 @@ app.add_handler(CommandHandler("makepdf", makepdf))
 app.add_handler(CommandHandler("play", play))
 app.add_handler(MessageHandler(filters.PHOTO, photo))
 
-app.run_polling()
+import os
+PORT = int(os.environ.get("PORT", 10000))
+
+app.run_webhook(
+    listen="0.0.0.0",
+    port=PORT,
+    webhook_url=os.environ["RENDER_EXTERNAL_URL"]
+)
