@@ -116,7 +116,8 @@ async def play(update: Update, context: ContextTypes.DEFAULT_TYPE):
         ydl.download([f"ytsearch:{song}"])
     await update.message.reply_audio(audio=open("song.mp3", "rb"))
 
-app = ApplicationBuilder().token("8503308378:AAGx0i8uZodoLt17LmofQ_zwVYEtNHlLreQ").build()
+import os
+app = ApplicationBuilder().token(os.environ.get("8503308378:AAGx0i8uZodoLt17LmofQ_zwVYEtNHlLreQ")).build()
 
 app.add_handler(CommandHandler("start", start))
 app.add_handler(CommandHandler("addtask", addtask))
