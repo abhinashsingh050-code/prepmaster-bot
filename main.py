@@ -40,11 +40,15 @@ async def done(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
 async def addlecture(update: Update, context: ContextTypes.DEFAULT_TYPE):
     user = update.message.from_user.id
-    subject = context.args[0]
-    count = int(context.args[1])
-    if user not in lectures:
-        lectures[user] = {}
-    lectures[user][subject] = count
+
+    try:
+        subject = context.args[0]
+        count = int(context.args[1])
+    except:
+        await update.message.reply_text("Use like: /addlecture Audit 10")
+        return
+
+    lectures.setdefault(user, {})[subject] = count
     await update.message.reply_text(f"{subject}: {count} lectures added")
 
 async def exam(update: Update, context: ContextTypes.DEFAULT_TYPE):
@@ -92,6 +96,7 @@ async def photo(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
 async def makepdf(update: Update, context: ContextTypes.DEFAULT_TYPE):
     user = update.message.from_user.id
+
     if user not in user_images or not user_images[user]:
         await update.message.reply_text("No images found.")
         return
@@ -101,10 +106,21 @@ async def makepdf(update: Update, context: ContextTypes.DEFAULT_TYPE):
     for img in user_images[user]:
         image = Image.open(img)
         width, height = image.size
-        ratio = height / width
 
-        pdf.add_page()
-        pdf.image(img, x=10, y=10, w=190, h=190 * ratio)
+        if width > height:
+            pdf.add_page(orientation='L')
+            pdf_w = 297
+            pdf_h = 210
+        else:
+            pdf.add_page()
+            pdf_w = 210
+            pdf_h = 297
+
+        ratio = min((pdf_w-20)/width, (pdf_h-20)/height)
+        new_w = width * ratio
+        new_h = height * ratio
+
+        pdf.image(img, x=10, y=10, w=new_w, h=new_h)
 
     pdf.output(f"{user}.pdf")
 
@@ -119,7 +135,7 @@ async def play(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
     ydl_opts = {
         'format': 'bestaudio',
-        'outtmpl': 'song.%(ext)s',
+        'outtmpl': '%(id)s.%(ext)s',
         'postprocessors': [{
             'key': 'FFmpegExtractAudio',
             'preferredcodec': 'mp3',
@@ -127,14 +143,14 @@ async def play(update: Update, context: ContextTypes.DEFAULT_TYPE):
     }
 
     with yt_dlp.YoutubeDL(ydl_opts) as ydl:
-        ydl.download([f"ytsearch:{song}"])
+        info = ydl.extract_info(f"ytsearch:{song}", download=True)
 
     for file in os.listdir():
         if file.endswith(".mp3"):
-            await update.message.reply_audio(audio=open(file, "rb"))
+            with open(file, "rb") as f:
+                await update.message.reply_audio(audio=f)
             os.remove(file)
             break
-
 import os
 app = ApplicationBuilder().token(os.environ.get("BOT_TOKEN")).build()
 
