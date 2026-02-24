@@ -1,4 +1,4 @@
-import os
+import from youtubesearchpython import VideosSearch
 from telegram import Update
 from telegram.ext import ApplicationBuilder, CommandHandler, ContextTypes, MessageHandler, filters
 from datetime import datetime
@@ -132,11 +132,18 @@ async def makepdf(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
 async def play(update: Update, context: ContextTypes.DEFAULT_TYPE):
     song = " ".join(context.args)
-    await update.message.reply_text("Downloading...")
+    await update.message.reply_text("Searching...")
+
+    try:
+        search = VideosSearch(song, limit=1)
+        result = search.result()
+        url = result['result'][0]['link']
+    except:
+        await update.message.reply_text("Song not found ❌")
+        return
 
     ydl_opts = {
-        'format': 'bestaudio[ext=m4a]',
-        'outtmpl': '%(id)s.%(ext)s',
+        'format': 'bestaudio',
         'quiet': True,
         'nocheckcertificate': True,
         'http_headers': {
@@ -146,17 +153,14 @@ async def play(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
     try:
         with yt_dlp.YoutubeDL(ydl_opts) as ydl:
-            ydl.download([f"ytsearch1:{song}"])
+            info = ydl.extract_info(url, download=False)
+            audio_url = info['url']
     except:
-        await update.message.reply_text("Song download failed ❌")
+        await update.message.reply_text("Streaming failed ❌")
         return
 
-    for file in os.listdir():
-        if file.endswith(".m4a"):
-            with open(file, "rb") as f:
-                await update.message.reply_audio(audio=f)
-            os.remove(file)
-            break
+    await update.message.reply_audio(audio=audio_url)
+    
 import os
 app = ApplicationBuilder().token(os.environ.get("BOT_TOKEN")).build()
 
