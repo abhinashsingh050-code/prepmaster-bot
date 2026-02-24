@@ -3,3 +3,4 @@ pillow
 fpdf
 yt-dlp
 flask
+youtube-search-python
