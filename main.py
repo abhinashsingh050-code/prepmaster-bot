@@ -130,21 +130,17 @@ async def makepdf(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
     user_images[user] = []
 
-import os async def play(update: Update, context: ContextTypes.DEFAULT_TYPE):
+async def play(update: Update, context: ContextTypes.DEFAULT_TYPE):
     song = " ".join(context.args)
     await update.message.reply_text("Downloading...")
 
     ydl_opts = {
-        'format': 'bestaudio',
+        'format': 'bestaudio[ext=m4a]',
         'outtmpl': '%(id)s.%(ext)s',
         'quiet': True,
         'nocheckcertificate': True,
-        'postprocessors': [{
-            'key': 'FFmpegExtractAudio',
-            'preferredcodec': 'mp3',
-        }],
         'http_headers': {
-            'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64)'
+            'User-Agent': 'Mozilla/5.0'
         }
     }
 
@@ -156,7 +152,7 @@ import os async def play(update: Update, context: ContextTypes.DEFAULT_TYPE):
         return
 
     for file in os.listdir():
-        if file.endswith(".mp3"):
+        if file.endswith(".m4a"):
             with open(file, "rb") as f:
                 await update.message.reply_audio(audio=f)
             os.remove(file)
