@@ -1,3 +1,6 @@
+import os
+from youtubesearchpython import VideosSearch
+import yt_dlp
 import subprocess
 subprocess.run(["pip", "install", "--upgrade", "yt-dlp"])
 from telegram import Update
@@ -6,7 +9,7 @@ from datetime import datetime
 import asyncio
 from PIL import Image
 from fpdf import FPDF
-import yt_dlp
+
 
 tasks = {}
 lectures = {}
@@ -131,7 +134,45 @@ async def makepdf(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
     user_images[user] = []
 
+async def play(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    song = " ".join(context.args)
 
+    if not song:
+        await update.message.reply_text("Use like: /play song name")
+        return
+
+    await update.message.reply_text("Searching...")
+
+    try:
+        search = VideosSearch(song, limit=1)
+        result = search.result()
+        video_url = result['result'][0]['link']
+    except:
+        await update.message.reply_text("Song not found ❌")
+        return
+
+    ydl_opts = {
+        'format': 'bestaudio',
+        'quiet': True,
+        'nocheckcertificate': True,
+        'geo_bypass': True,
+        'http_headers': {
+            'User-Agent': 'Mozilla/5.0'
+        }
+    }
+
+    try:
+        with yt_dlp.YoutubeDL(ydl_opts) as ydl:
+            info = ydl.extract_info(video_url, download=False)
+            audio_url = info['url']
+    except:
+        await update.message.reply_text("Streaming failed ❌")
+        return
+
+    try:
+        await update.message.reply_audio(audio=audio_url)
+    except:
+        await update.message.reply_text("Playback failed ❌")
     
 import os
 app = ApplicationBuilder().token(os.environ.get("BOT_TOKEN")).build()
