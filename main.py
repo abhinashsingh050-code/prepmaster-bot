@@ -1,3 +1,4 @@
+import os
 from telegram import Update
 from telegram.ext import ApplicationBuilder, CommandHandler, ContextTypes, MessageHandler, filters
 from datetime import datetime
@@ -129,21 +130,30 @@ async def makepdf(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
     user_images[user] = []
 
-async def play(update: Update, context: ContextTypes.DEFAULT_TYPE):
+import os async def play(update: Update, context: ContextTypes.DEFAULT_TYPE):
     song = " ".join(context.args)
     await update.message.reply_text("Downloading...")
 
     ydl_opts = {
         'format': 'bestaudio',
         'outtmpl': '%(id)s.%(ext)s',
+        'quiet': True,
+        'nocheckcertificate': True,
         'postprocessors': [{
             'key': 'FFmpegExtractAudio',
             'preferredcodec': 'mp3',
         }],
+        'http_headers': {
+            'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64)'
+        }
     }
 
-    with yt_dlp.YoutubeDL(ydl_opts) as ydl:
-        info = ydl.extract_info(f"ytsearch:{song}", download=True)
+    try:
+        with yt_dlp.YoutubeDL(ydl_opts) as ydl:
+            ydl.download([f"ytsearch1:{song}"])
+    except:
+        await update.message.reply_text("Song download failed ❌")
+        return
 
     for file in os.listdir():
         if file.endswith(".mp3"):
