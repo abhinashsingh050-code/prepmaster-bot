@@ -1,4 +1,5 @@
-import from youtubesearchpython import VideosSearch
+import subprocess
+subprocess.run(["pip", "install", "--upgrade", "yt-dlp"])
 from telegram import Update
 from telegram.ext import ApplicationBuilder, CommandHandler, ContextTypes, MessageHandler, filters
 from datetime import datetime
