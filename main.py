@@ -131,36 +131,7 @@ async def makepdf(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
     user_images[user] = []
 
-async def play(update: Update, context: ContextTypes.DEFAULT_TYPE):
-    song = " ".join(context.args)
-    await update.message.reply_text("Searching...")
 
-    try:
-        search = VideosSearch(song, limit=1)
-        result = search.result()
-        url = result['result'][0]['link']
-    except:
-        await update.message.reply_text("Song not found ❌")
-        return
-
-    ydl_opts = {
-        'format': 'bestaudio',
-        'quiet': True,
-        'nocheckcertificate': True,
-        'http_headers': {
-            'User-Agent': 'Mozilla/5.0'
-        }
-    }
-
-    try:
-        with yt_dlp.YoutubeDL(ydl_opts) as ydl:
-            info = ydl.extract_info(url, download=False)
-            audio_url = info['url']
-    except:
-        await update.message.reply_text("Streaming failed ❌")
-        return
-
-    await update.message.reply_audio(audio=audio_url)
     
 import os
 app = ApplicationBuilder().token(os.environ.get("BOT_TOKEN")).build()
