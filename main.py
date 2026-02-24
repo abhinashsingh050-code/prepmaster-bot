@@ -80,12 +80,22 @@ async def strategy(update: Update, context: ContextTypes.DEFAULT_TYPE):
     await update.message.reply_text(msg)
 
 async def focus(update: Update, context: ContextTypes.DEFAULT_TYPE):
-    minutes = int(context.args[0])
-    await update.message.reply_text(f"Focus started for {minutes} minutes")
+
+    try:
+        minutes = int(context.args[0])
+    except:
+        await update.message.reply_text("Use like: /focus 5")
+        return
+
+    await update.message.reply_text(f"🔥 Focus Mode Started for {minutes} minutes")
 
     async def timer():
         await asyncio.sleep(minutes * 60)
-        await update.message.reply_text("Time’s up!")
+        await update.message.reply_text(
+            "🎉 Congratulations Champ!\n"
+            "You completed your focus session 💪\n"
+            "Take a short break and get ready for the next grind 🚀"
+        )
 
     context.application.create_task(timer())
     
