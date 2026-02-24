@@ -73,9 +73,13 @@ async def strategy(update: Update, context: ContextTypes.DEFAULT_TYPE):
 async def focus(update: Update, context: ContextTypes.DEFAULT_TYPE):
     minutes = int(context.args[0])
     await update.message.reply_text(f"Focus started for {minutes} minutes")
-    await asyncio.sleep(minutes * 60)
-    await update.message.reply_text("Time’s up! Mark your task done.")
 
+    async def timer():
+        await asyncio.sleep(minutes * 60)
+        await update.message.reply_text("Time’s up!")
+
+    context.application.create_task(timer())
+    
 async def photo(update: Update, context: ContextTypes.DEFAULT_TYPE):
     user = update.message.from_user.id
     if user not in user_images:
@@ -91,30 +95,45 @@ async def makepdf(update: Update, context: ContextTypes.DEFAULT_TYPE):
     if user not in user_images or not user_images[user]:
         await update.message.reply_text("No images found.")
         return
+
     pdf = FPDF()
+
     for img in user_images[user]:
+        image = Image.open(img)
+        width, height = image.size
+        ratio = height / width
+
         pdf.add_page()
-        pdf.image(img, 10, 10, 190)
+        pdf.image(img, x=10, y=10, w=190, h=190 * ratio)
+
     pdf.output(f"{user}.pdf")
+
     with open(f"{user}.pdf", "rb") as f:
         await update.message.reply_document(f)
+
     user_images[user] = []
 
 async def play(update: Update, context: ContextTypes.DEFAULT_TYPE):
     song = " ".join(context.args)
     await update.message.reply_text("Downloading...")
+
     ydl_opts = {
-        'format': 'bestaudio/best',
+        'format': 'bestaudio',
         'outtmpl': 'song.%(ext)s',
         'postprocessors': [{
             'key': 'FFmpegExtractAudio',
             'preferredcodec': 'mp3',
-            'preferredquality': '192',
         }],
     }
+
     with yt_dlp.YoutubeDL(ydl_opts) as ydl:
         ydl.download([f"ytsearch:{song}"])
-    await update.message.reply_audio(audio=open("song.mp3", "rb"))
+
+    for file in os.listdir():
+        if file.endswith(".mp3"):
+            await update.message.reply_audio(audio=open(file, "rb"))
+            os.remove(file)
+            break
 
 import os
 app = ApplicationBuilder().token(os.environ.get("BOT_TOKEN")).build()
