@@ -184,17 +184,12 @@ async def play(update: Update, context: ContextTypes.DEFAULT_TYPE):
     except:
         await update.message.reply_text("Playback failed ❌")
 
-async def classlink(update: Update, context: ContextTypes.DEFAULT_TYPE):
-    await update.message.reply_text(
-        "📚 Today's Class Link:\n"
-        "https://drive.google.com/drive/folders/1X06ag_o9hHVJgOljndYj512HwBh98hgs"
-    )
+
 
 import os
 app = ApplicationBuilder().token(os.environ.get("BOT_TOKEN")).build()
 
 app.add_handler(CommandHandler("start", start))
-app.add_handler(CommandHandler("class", classlink))
 app.add_handler(CommandHandler("addtask", addtask))
 app.add_handler(CommandHandler("viewtasks", viewtasks))
 app.add_handler(CommandHandler("done", done))
