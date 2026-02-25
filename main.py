@@ -94,7 +94,7 @@ async def focus(update: Update, context: ContextTypes.DEFAULT_TYPE):
         await update.message.reply_text(
             "🎉 Congratulations Champ!\n"
             "You completed your focus session 💪\n"
-            "Take a short break and get ready for the next grind 🚀"
+            "Take a short break and get ready for the next grind "
         )
 
     context.application.create_task(timer())
@@ -183,11 +183,18 @@ async def play(update: Update, context: ContextTypes.DEFAULT_TYPE):
         await update.message.reply_audio(audio=audio_url)
     except:
         await update.message.reply_text("Playback failed ❌")
-    
+
+async def classlink(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    await update.message.reply_text(
+        "📚 Today's Class Link:\n"
+        "https://drive.google.com/drive/folders/1X06ag_o9hHVJgOljndYj512HwBh98hgs"
+    )
+
 import os
 app = ApplicationBuilder().token(os.environ.get("BOT_TOKEN")).build()
 
 app.add_handler(CommandHandler("start", start))
+app.add_handler(CommandHandler("class", classlink))
 app.add_handler(CommandHandler("addtask", addtask))
 app.add_handler(CommandHandler("viewtasks", viewtasks))
 app.add_handler(CommandHandler("done", done))
