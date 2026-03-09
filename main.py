@@ -95,6 +95,7 @@ async def focus(update: Update, context: ContextTypes.DEFAULT_TYPE):
             "🎉 Congratulations Champ!\n"
             "You completed your focus session 💪\n"
             "Take a short break and get ready for the next grind "
+            " Best Of Luck Champs "
         )
 
     context.application.create_task(timer())
@@ -158,7 +159,7 @@ async def play(update: Update, context: ContextTypes.DEFAULT_TYPE):
         result = search.result()
         video_url = result['result'][0]['link']
     except:
-        await update.message.reply_text("Song not found ❌")
+        await update.message.reply_text("Song not found try Once again ❌")
         return
 
     ydl_opts = {
